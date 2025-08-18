@@ -32,9 +32,24 @@
   </table>
 
   <script>
+    // Normalise (supprime accents) + minuscule
+    const norm = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+    // Filtre les lignes selon l'input #search
+    function applySearchFilter() {
+      const q = norm(document.getElementById('search')?.value || '');
+      const rows = document.querySelectorAll('#cards-body tr');
+      rows.forEach(tr => {
+        const nameTxt = norm(tr.cells?.[0]?.textContent || '');
+        tr.style.display = nameTxt.includes(q) ? '' : 'none';
+      });
+    }
+
     // Attendre que le HTML soit prêt
     document.addEventListener("DOMContentLoaded", () => {
-      loadCards();
+      loadCards(); // charge puis rend le tableau
+      const search = document.getElementById('search');
+      if (search) search.addEventListener('input', applySearchFilter); // filtre à chaque frappe
     });
 
     // Charge cards.json et rend le tableau
@@ -56,6 +71,7 @@
         `).join("");
 
         tbody.innerHTML = rows;
+        applySearchFilter(); // applique le filtre initial si une valeur est déjà saisie
       } catch (err) {
         console.error("Erreur de chargement des cartes :", err);
         tbody.innerHTML = `

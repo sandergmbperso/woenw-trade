@@ -18,14 +18,14 @@ Objectif : afficher les cartes depuis un fichier JSON, puis ajouter recherche, f
 |-----------------|----------------------|-------------------------------------------------|
 | V0.1            | Tableau statique     | HTML seul avec 10 cartes codées en dur.         |
 | V0.2            | Génération JS        | Lignes `<tr>` créées côté client (JavaScript).  |
-| V0.2.1          | Fichier cards.json   | Données séparées dans un fichier JSON + fetch. |
+| V0.2.1          | Fichier cards.json   | Données séparées dans un fichier JSON + fetch.  |
 | V0.2.2          | Gestion erreurs      | Message si le JSON est introuvable / mal chargé.|
+| V0.3            | Recherche par nom    | Filtrage client insensible à la casse/accents.  |
 
 ---
 
 ## Roadmap
 
-- **V0.3** : Champ de recherche par nom (filtrage client, insensible à la casse/accents).  
 - **V0.4** : Filtres Type / Rareté / Extension (menus déroulants).  
 - **V0.5** : Boutons “Wishlist” et “Doublon” (stockage localStorage).  
 - **V0.6** : Multi-profils (amis : Pocho, Julien, Yaël, David) avec listes séparées.  
