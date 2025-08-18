@@ -1,0 +1,13 @@
+[
+    { "id": "c1", "name": "Pikachu #25", "type": "Lightning", "rarity": "Rare", "set": "Base Pocket" },
+    { "id": "c2", "name": "Evoli #133", "type": "Colorless", "rarity": "Uncommon", "set": "Base Pocket" },
+    { "id": "c3", "name": "Dracaufeu (Immersive)", "type": "Fire", "rarity": "Immersive", "set": "Crimson Blaze" },
+    { "id": "c4", "name": "Bulbizarre #1", "type": "Grass", "rarity": "Common", "set": "Base Pocket" },
+    { "id": "c5", "name": "Mewtwo #150", "type": "Psychic", "rarity": "Ultra", "set": "Mindstorm" },
+    { "id": "c6", "name": "Salamèche #4", "type": "Fire", "rarity": "Common", "set": "Base Pocket" },
+    { "id": "c7", "name": "Carapuce #7", "type": "Water", "rarity": "Common", "set": "Base Pocket" },
+    { "id": "c8", "name": "Roucool #16", "type": "Colorless", "rarity": "Common", "set": "Base Pocket" },
+    { "id": "c9", "name": "Machoc #66", "type": "Fighting", "rarity": "Uncommon", "set": "Base Pocket" },
+    { "id": "c10", "name": "Magnéti #81", "type": "Metal", "rarity": "Uncommon", "set": "Steel Surge" }
+  ]
+  

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Woenw Trade — V0.1</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 24px; }
+    h1 { margin-bottom: 12px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ddd; padding: 8px 10px; text-align: left; }
+    th { background: #f6f6f6; }
+  </style>
+</head>
+<body>
+  <h1>Liste de cartes (version test)</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Nom</th>
+        <th>Type</th>
+        <th>Rareté</th>
+        <th>Extension</th>
+      </tr>
+    </thead>
+    <tbody id="cards-body">
+      <!-- Les lignes seront générées en JS -->
+    </tbody>
+  </table>
+
+  <script>
+    // Attendre que le HTML soit prêt
+    document.addEventListener("DOMContentLoaded", () => {
+      loadCards();
+    });
+
+    // Charge cards.json et rend le tableau
+    async function loadCards() {
+      const tbody = document.getElementById("cards-body");
+
+      try {
+        const res = await fetch("cards.json"); // nécessite Live Server (http://), pas file://
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const cards = await res.json();
+
+        const rows = cards.map(c => `
+          <tr>
+            <td>${c.name}</td>
+            <td>${c.type}</td>
+            <td>${c.rarity}</td>
+            <td>${c.set}</td>
+          </tr>
+        `).join("");
+
+        tbody.innerHTML = rows;
+      } catch (err) {
+        console.error("Erreur de chargement des cartes :", err);
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="4" style="color:#b00;">
+              Impossible de charger <code>cards.json</code>. Vérifie que tu l'exécutes avec Live Server
+              et que le fichier est au même niveau que <code>index.html</code>.
+            </td>
+          </tr>
+        `;
+      }
+    }
+  </script>
+</body>
+</html>
