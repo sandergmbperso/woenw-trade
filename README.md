@@ -3,12 +3,14 @@
 Projet web expérimental pour lister et gérer des cartes (version test).  
 Objectif : afficher les cartes depuis un fichier JSON, puis ajouter recherche, filtres, wishlist/doublons et comparaison entre amis.  
 
-## Fonctionnalités actuelles (V0.2.2)
+## Fonctionnalités actuelles (V0.4)
 
 - Tableau HTML lisible (CSS minimal).  
 - Données externalisées dans `cards.json` (chargées via `fetch`).  
 - Génération dynamique des lignes par JavaScript.  
-- Gestion d’erreur si `cards.json` est introuvable ou invalide (message affiché dans le tableau).  
+- Gestion d’erreur si `cards.json` est introuvable ou invalide.  
+- Recherche par nom en temps réel (insensible à la casse/accents).  
+- Filtres par Type, Rareté et Extension (combinaison possible avec la recherche). ✅ NEW
 
 ---
 
@@ -21,12 +23,12 @@ Objectif : afficher les cartes depuis un fichier JSON, puis ajouter recherche, f
 | V0.2.1          | Fichier cards.json   | Données séparées dans un fichier JSON + fetch.  |
 | V0.2.2          | Gestion erreurs      | Message si le JSON est introuvable / mal chargé.|
 | V0.3            | Recherche par nom    | Filtrage client insensible à la casse/accents.  |
+| V0.4            | Filtres avancés      | Type / Rareté / Extension combinés avec recherche. |
 
 ---
 
 ## Roadmap
 
-- **V0.4** : Filtres Type / Rareté / Extension (menus déroulants).  
 - **V0.5** : Boutons “Wishlist” et “Doublon” (stockage localStorage).  
 - **V0.6** : Multi-profils (amis : Pocho, Julien, Yaël, David) avec listes séparées.  
 - **V1.0** : Partage & comparaison (détection d’échanges possibles entre amis).  

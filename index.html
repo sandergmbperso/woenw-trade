@@ -17,6 +17,18 @@
 
   <input id="search" type="text" placeholder="Rechercher une carte…" autocomplete="off" />
 
+  <select id="filter-type">
+    <option value="">-- Type --</option>
+  </select>
+  
+  <select id="filter-rarity">
+    <option value="">-- Rareté --</option>
+  </select>
+  
+  <select id="filter-set">
+    <option value="">-- Extension --</option>
+  </select>
+
   <table>
     <thead>
       <tr>
@@ -35,21 +47,15 @@
     // Normalise (supprime accents) + minuscule
     const norm = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
-    // Filtre les lignes selon l'input #search
-    function applySearchFilter() {
-      const q = norm(document.getElementById('search')?.value || '');
-      const rows = document.querySelectorAll('#cards-body tr');
-      rows.forEach(tr => {
-        const nameTxt = norm(tr.cells?.[0]?.textContent || '');
-        tr.style.display = nameTxt.includes(q) ? '' : 'none';
-      });
-    }
-
     // Attendre que le HTML soit prêt
     document.addEventListener("DOMContentLoaded", () => {
       loadCards(); // charge puis rend le tableau
       const search = document.getElementById('search');
-      if (search) search.addEventListener('input', applySearchFilter); // filtre à chaque frappe
+      if (search) search.addEventListener('input', applyAllFilters);
+      document.getElementById('filter-type')?.addEventListener('change', applyAllFilters);
+      document.getElementById('filter-rarity')?.addEventListener('change', applyAllFilters);
+      document.getElementById('filter-set')?.addEventListener('change', applyAllFilters);
+
     });
 
     // Charge cards.json et rend le tableau
@@ -71,7 +77,8 @@
         `).join("");
 
         tbody.innerHTML = rows;
-        applySearchFilter(); // applique le filtre initial si une valeur est déjà saisie
+        applyAllFilters(); // applique le filtre initial si une valeur est déjà saisie
+        populateFilters(cards); // remplit les filtres avec les valeurs uniques
       } catch (err) {
         console.error("Erreur de chargement des cartes :", err);
         tbody.innerHTML = `
@@ -84,6 +91,75 @@
         `;
       }
     }
+    
+    function populateFilters(cards) {
+      // 1) Récupère les <select>
+      const typeSelect = document.getElementById('filter-type');
+      const raritySelect = document.getElementById('filter-rarity');
+      const setSelect = document.getElementById('filter-set');
+
+      // 2) Utilitaires pour extraire les valeurs uniques
+      const uniq = arr => [...new Set(arr)].sort();
+
+      // 3) Valeurs distinctes dans le JSON
+      const types = uniq(cards.map(c => c.type));
+      const rarities = uniq(cards.map(c => c.rarity));
+      const sets = uniq(cards.map(c => c.set));
+
+      // 4) Ajout dynamique dans chaque <select>
+      types.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t;
+        opt.textContent = t;
+        typeSelect.appendChild(opt);
+      });
+
+      rarities.forEach(r => {
+        const opt = document.createElement('option');
+        opt.value = r;
+        opt.textContent = r;
+        raritySelect.appendChild(opt);
+      });
+
+      sets.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s;
+        opt.textContent = s;
+        setSelect.appendChild(opt);
+      });
+    }
+
+    function applyAllFilters() {
+      const q = norm(document.getElementById('search')?.value || '');
+      const typeVal = document.getElementById('filter-type')?.value || '';
+      const rarityVal = document.getElementById('filter-rarity')?.value || '';
+      const setVal = document.getElementById('filter-set')?.value || '';
+
+      const rows = document.querySelectorAll('#cards-body tr');
+      rows.forEach(tr => {
+        const nameTxt = norm(tr.cells?.[0]?.textContent || '');
+        const typeTxt = tr.cells?.[1]?.textContent || '';
+        const rarityTxt = tr.cells?.[2]?.textContent || '';
+        const setTxt = tr.cells?.[3]?.textContent || '';
+
+        // condition 1 : correspond à la recherche texte
+        const matchSearch = nameTxt.includes(q);
+
+        // condition 2 : correspond au type choisi (ou pas de filtre)
+        const matchType = !typeVal || typeTxt === typeVal;
+
+        // condition 3 : correspond à la rareté choisie (ou pas de filtre)
+        const matchRarity = !rarityVal || rarityTxt === rarityVal;
+
+        // condition 4 : correspond à l'extension choisie (ou pas de filtre)
+        const matchSet = !setVal || setTxt === setVal;
+
+        // Affiche si toutes les conditions sont vraies
+        tr.style.display = (matchSearch && matchType && matchRarity && matchSet) ? '' : 'none';
+      });
+    }
+
+
   </script>
 </body>
 </html>
