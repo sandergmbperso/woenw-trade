@@ -10,6 +10,11 @@
     th, td { border: 1px solid #ddd; padding: 8px 10px; text-align: left; }
     th { background: #f6f6f6; }
     #search { margin: 8px 0 16px; padding: 6px 8px; width: 100%; max-width: 420px; }
+    button.active {
+      background: #4caf50;
+      color: white;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -36,6 +41,7 @@
         <th>Type</th>
         <th>Rareté</th>
         <th>Extension</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody id="cards-body">
@@ -44,6 +50,13 @@
   </table>
 
   <script>
+    // Données utilisateur persistées
+    let userData = { wishlist: [], doublons: [] };
+
+    // Charger l'état existant depuis localStorage
+    const saved = localStorage.getItem('woenwData');
+    if (saved) userData = JSON.parse(saved);
+
     // Normalise (supprime accents) + minuscule
     const norm = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
@@ -73,12 +86,18 @@
             <td>${c.type}</td>
             <td>${c.rarity}</td>
             <td>${c.set}</td>
+            <td>
+              <button class="wishlist-btn" data-id="${c.name}">Wishlist</button>
+              <button class="doublon-btn" data-id="${c.name}">Doublon</button>
+            </td>
           </tr>
         `).join("");
 
         tbody.innerHTML = rows;
         applyAllFilters(); // applique le filtre initial si une valeur est déjà saisie
         populateFilters(cards); // remplit les filtres avec les valeurs uniques
+        attachButtonHandlers();  // ✅ brancher les clics
+        restoreButtonStates();   // ✅ remettre l’état visuel
       } catch (err) {
         console.error("Erreur de chargement des cartes :", err);
         tbody.innerHTML = `
@@ -159,6 +178,48 @@
       });
     }
 
+    // Gère les clics sur les boutons Wishlist et Doublon
+    function attachButtonHandlers() {
+      document.querySelectorAll('.wishlist-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.dataset.id;
+          if (userData.wishlist.includes(id)) {
+            userData.wishlist = userData.wishlist.filter(x => x !== id);
+            btn.classList.remove('active');
+          } else {
+            userData.wishlist.push(id);
+            btn.classList.add('active');
+          }
+          localStorage.setItem('woenwData', JSON.stringify(userData));
+        });
+      });
+
+      document.querySelectorAll('.doublon-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.dataset.id;
+          if (userData.doublons.includes(id)) {
+            userData.doublons = userData.doublons.filter(x => x !== id);
+            btn.classList.remove('active');
+          } else {
+            userData.doublons.push(id);
+            btn.classList.add('active');
+          }
+          localStorage.setItem('woenwData', JSON.stringify(userData));
+        });
+      });
+    }
+
+    // Restaure l'état des boutons Wishlist et Doublon
+    function restoreButtonStates() {
+      userData.wishlist.forEach(id => {
+        const btn = document.querySelector(`.wishlist-btn[data-id="${id}"]`);
+        if (btn) btn.classList.add('active');
+      });
+      userData.doublons.forEach(id => {
+        const btn = document.querySelector(`.doublon-btn[data-id="${id}"]`);
+        if (btn) btn.classList.add('active');
+      });
+    }
 
   </script>
 </body>
