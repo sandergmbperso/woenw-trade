@@ -2,41 +2,111 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <title>Woenw Trade — V0.1</title>
+  <title>Woenw Trade — V0.7</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
+    /* === Style général === */
+    :root { color-scheme: light dark; } /* support thème clair/sombre auto */
     body { font-family: system-ui, sans-serif; margin: 24px; }
     h1 { margin-bottom: 12px; }
+
+    /* === Bandeau source données === */
+    #data-source-banner { 
+      margin: 8px 0 16px; 
+      padding: 8px 10px; 
+      font-size: 14px; 
+      background: #f2f2f2; 
+      border-left: 4px solid #9aa0a6; 
+    }
+
+    /* === Zone de contrôles (profil, recherche, filtres) === */
+    #controls { 
+      display: grid; 
+      grid-template-columns: repeat(6, minmax(120px, 1fr)); 
+      gap: 8px; 
+      align-items: end; 
+      margin: 12px 0 16px; 
+    }
+    #controls label { font-size: 12px; color: #555; }
+
+    /* === Tableau === */
     table { width: 100%; border-collapse: collapse; }
     th, td { border: 1px solid #ddd; padding: 8px 10px; text-align: left; }
     th { background: #f6f6f6; }
-    #search { margin: 8px 0 16px; padding: 6px 8px; width: 100%; max-width: 420px; }
-    button.active {
-      background: #4caf50;
-      color: white;
-      font-weight: bold;
-    }
+
+    /* === Formulaires === */
+    input[type="text"], select { padding: 6px 8px; width: 100%; box-sizing: border-box; }
+
+    /* === Boutons === */
+    button { padding: 6px 10px; cursor: pointer; }
+    button.active { background: #4caf50; color: #fff; font-weight: 600; }
+
+    /* === Responsive : sur petit écran, 2 colonnes au lieu de 6 === */
+    @media (max-width: 900px) { #controls { grid-template-columns: repeat(2, 1fr); } }
   </style>
 </head>
 <body>
-  <h1>Liste de cartes (version test)</h1>
+  <!-- === Titre principal === -->
+  <h1>Woenw Trade — Liste de cartes (version test)</h1>
 
-  <input id="search" type="text" placeholder="Rechercher une carte…" autocomplete="off" />
+  <!-- === Bandeau indiquant la source des données (local | tcgdex) === -->
+  <div id="data-source-banner">
+    Mode données : <strong>local</strong>
+  </div>
 
-  <select id="filter-type">
-    <option value="">-- Type --</option>
-  </select>
-  
-  <select id="filter-rarity">
-    <option value="">-- Rareté --</option>
-  </select>
-  
-  <select id="filter-set">
-    <option value="">-- Extension --</option>
-  </select>
+  <!-- === Zone de contrôles (profil, recherche, filtres) === -->
+  <div id="controls">
 
+    <!-- Sélecteur de profil -->
+    <div>
+      <label for="profile">Profil</label>
+      <select id="profile">
+        <option value="Pocho">Pocho</option>
+        <option value="Julien">Julien</option>
+        <option value="Yaël">Yaël</option>
+        <option value="David">David</option>
+      </select>
+    </div>
+
+    <!-- Recherche par nom -->
+    <div>
+      <label for="search">Recherche</label>
+      <input id="search" type="text" placeholder="Rechercher une carte…" autocomplete="off" />
+    </div>
+
+    <!-- Filtre par type -->
+    <div>
+      <label for="filter-type">Type</label>
+      <select id="filter-type">
+        <option value="">-- Tous --</option>
+      </select>
+    </div>
+
+    <!-- Filtre par rareté -->
+    <div>
+      <label for="filter-rarity">Rareté</label>
+      <select id="filter-rarity">
+        <option value="">-- Toutes --</option>
+      </select>
+    </div>
+
+    <!-- Filtre par extension -->
+    <div>
+      <label for="filter-set">Extension</label>
+      <select id="filter-set">
+        <option value="">-- Toutes --</option>
+      </select>
+    </div>
+
+    <!-- Case vide pour équilibrer la grille -->
+    <div></div>
+  </div>
+
+  <!-- === Tableau principal === -->
   <table>
     <thead>
       <tr>
+        <th>Visuel</th>
         <th>Nom</th>
         <th>Type</th>
         <th>Rareté</th>
@@ -45,182 +115,21 @@
       </tr>
     </thead>
     <tbody id="cards-body">
-      <!-- Les lignes seront générées en JS -->
+      <!-- Les lignes seront générées en JavaScript -->
     </tbody>
   </table>
 
+  <!-- === Script de mise à jour du bandeau (affiche la source actuelle) === -->
   <script>
-    // Données utilisateur persistées
-    let userData = { wishlist: [], doublons: [] };
-
-    // Charger l'état existant depuis localStorage
-    const saved = localStorage.getItem('woenwData');
-    if (saved) userData = JSON.parse(saved);
-
-    // Normalise (supprime accents) + minuscule
-    const norm = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-
-    // Attendre que le HTML soit prêt
-    document.addEventListener("DOMContentLoaded", () => {
-      loadCards(); // charge puis rend le tableau
-      const search = document.getElementById('search');
-      if (search) search.addEventListener('input', applyAllFilters);
-      document.getElementById('filter-type')?.addEventListener('change', applyAllFilters);
-      document.getElementById('filter-rarity')?.addEventListener('change', applyAllFilters);
-      document.getElementById('filter-set')?.addEventListener('change', applyAllFilters);
-
-    });
-
-    // Charge cards.json et rend le tableau
-    async function loadCards() {
-      const tbody = document.getElementById("cards-body");
-
-      try {
-        const res = await fetch("cards.json"); // nécessite Live Server (http://), pas file://
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        const cards = await res.json();
-
-        const rows = cards.map(c => `
-          <tr>
-            <td>${c.name}</td>
-            <td>${c.type}</td>
-            <td>${c.rarity}</td>
-            <td>${c.set}</td>
-            <td>
-              <button class="wishlist-btn" data-id="${c.name}">Wishlist</button>
-              <button class="doublon-btn" data-id="${c.name}">Doublon</button>
-            </td>
-          </tr>
-        `).join("");
-
-        tbody.innerHTML = rows;
-        applyAllFilters(); // applique le filtre initial si une valeur est déjà saisie
-        populateFilters(cards); // remplit les filtres avec les valeurs uniques
-        attachButtonHandlers();  // ✅ brancher les clics
-        restoreButtonStates();   // ✅ remettre l’état visuel
-      } catch (err) {
-        console.error("Erreur de chargement des cartes :", err);
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="4" style="color:#b00;">
-              Impossible de charger <code>cards.json</code>. Vérifie que tu l'exécutes avec Live Server
-              et que le fichier est au même niveau que <code>index.html</code>.
-            </td>
-          </tr>
-        `;
+    window.addEventListener('DOMContentLoaded', () => {
+      const banner = document.getElementById('data-source-banner');
+      if (banner && window.DATA_SOURCE) {
+        banner.innerHTML = `Mode données : <strong>${window.DATA_SOURCE}</strong>`;
       }
-    }
-    
-    function populateFilters(cards) {
-      // 1) Récupère les <select>
-      const typeSelect = document.getElementById('filter-type');
-      const raritySelect = document.getElementById('filter-rarity');
-      const setSelect = document.getElementById('filter-set');
-
-      // 2) Utilitaires pour extraire les valeurs uniques
-      const uniq = arr => [...new Set(arr)].sort();
-
-      // 3) Valeurs distinctes dans le JSON
-      const types = uniq(cards.map(c => c.type));
-      const rarities = uniq(cards.map(c => c.rarity));
-      const sets = uniq(cards.map(c => c.set));
-
-      // 4) Ajout dynamique dans chaque <select>
-      types.forEach(t => {
-        const opt = document.createElement('option');
-        opt.value = t;
-        opt.textContent = t;
-        typeSelect.appendChild(opt);
-      });
-
-      rarities.forEach(r => {
-        const opt = document.createElement('option');
-        opt.value = r;
-        opt.textContent = r;
-        raritySelect.appendChild(opt);
-      });
-
-      sets.forEach(s => {
-        const opt = document.createElement('option');
-        opt.value = s;
-        opt.textContent = s;
-        setSelect.appendChild(opt);
-      });
-    }
-
-    function applyAllFilters() {
-      const q = norm(document.getElementById('search')?.value || '');
-      const typeVal = document.getElementById('filter-type')?.value || '';
-      const rarityVal = document.getElementById('filter-rarity')?.value || '';
-      const setVal = document.getElementById('filter-set')?.value || '';
-
-      const rows = document.querySelectorAll('#cards-body tr');
-      rows.forEach(tr => {
-        const nameTxt = norm(tr.cells?.[0]?.textContent || '');
-        const typeTxt = tr.cells?.[1]?.textContent || '';
-        const rarityTxt = tr.cells?.[2]?.textContent || '';
-        const setTxt = tr.cells?.[3]?.textContent || '';
-
-        // condition 1 : correspond à la recherche texte
-        const matchSearch = nameTxt.includes(q);
-
-        // condition 2 : correspond au type choisi (ou pas de filtre)
-        const matchType = !typeVal || typeTxt === typeVal;
-
-        // condition 3 : correspond à la rareté choisie (ou pas de filtre)
-        const matchRarity = !rarityVal || rarityTxt === rarityVal;
-
-        // condition 4 : correspond à l'extension choisie (ou pas de filtre)
-        const matchSet = !setVal || setTxt === setVal;
-
-        // Affiche si toutes les conditions sont vraies
-        tr.style.display = (matchSearch && matchType && matchRarity && matchSet) ? '' : 'none';
-      });
-    }
-
-    // Gère les clics sur les boutons Wishlist et Doublon
-    function attachButtonHandlers() {
-      document.querySelectorAll('.wishlist-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const id = btn.dataset.id;
-          if (userData.wishlist.includes(id)) {
-            userData.wishlist = userData.wishlist.filter(x => x !== id);
-            btn.classList.remove('active');
-          } else {
-            userData.wishlist.push(id);
-            btn.classList.add('active');
-          }
-          localStorage.setItem('woenwData', JSON.stringify(userData));
-        });
-      });
-
-      document.querySelectorAll('.doublon-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const id = btn.dataset.id;
-          if (userData.doublons.includes(id)) {
-            userData.doublons = userData.doublons.filter(x => x !== id);
-            btn.classList.remove('active');
-          } else {
-            userData.doublons.push(id);
-            btn.classList.add('active');
-          }
-          localStorage.setItem('woenwData', JSON.stringify(userData));
-        });
-      });
-    }
-
-    // Restaure l'état des boutons Wishlist et Doublon
-    function restoreButtonStates() {
-      userData.wishlist.forEach(id => {
-        const btn = document.querySelector(`.wishlist-btn[data-id="${id}"]`);
-        if (btn) btn.classList.add('active');
-      });
-      userData.doublons.forEach(id => {
-        const btn = document.querySelector(`.doublon-btn[data-id="${id}"]`);
-        if (btn) btn.classList.add('active');
-      });
-    }
-
+    });
   </script>
+
+  <!-- === Script principal (logique JS) === -->
+  <script src="script.js"></script>
 </body>
 </html>
