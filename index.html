@@ -2,134 +2,147 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <title>Woenw Trade — V0.7</title>
+  <title>Woenw Trade — V0.7.15 (Pocket • All sets • Grid + Tri/Filters)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    /* === Style général === */
-    :root { color-scheme: light dark; } /* support thème clair/sombre auto */
-    body { font-family: system-ui, sans-serif; margin: 24px; }
-    h1 { margin-bottom: 12px; }
-
-    /* === Bandeau source données === */
-    #data-source-banner { 
-      margin: 8px 0 16px; 
-      padding: 8px 10px; 
-      font-size: 14px; 
-      background: #f2f2f2; 
-      border-left: 4px solid #9aa0a6; 
+    :root{
+      --bg:#0b0c10; --panel:#111219; --muted:#8f95a3; --text:#e9ecf1;
+      --accent:#4caf50; --border:#1b1d27; --card:#141624; --shadow:rgba(0,0,0,.18);
+      --col-min: 200px; --gap: 20px;
     }
+    *{box-sizing:border-box}
+    body{ margin:0; padding:18px; font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+      background:var(--bg); color:var(--text); }
+    h1{margin:0 0 8px 0; font-size:22px}
+    .sub{color:var(--muted); font-size:13px; margin-bottom:14px}
+    .pill{ padding:6px 10px; border-radius:999px; background:#0d0f18;
+      border:1px solid var(--border); color:var(--muted); font-size:12px }
 
-    /* === Zone de contrôles (profil, recherche, filtres) === */
-    #controls { 
-      display: grid; 
-      grid-template-columns: repeat(6, minmax(120px, 1fr)); 
-      gap: 8px; 
-      align-items: end; 
-      margin: 12px 0 16px; 
+    .controls{
+      display:grid; gap:10px; align-items:center;
+      grid-template-columns: minmax(220px,1fr) 220px 220px 260px 170px 210px auto auto;
+      background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:12px;
     }
-    #controls label { font-size: 12px; color: #555; }
+    .controls input[type="text"], .controls select, .controls button{
+      background:#0d0f18; color:var(--text); border:1px solid var(--border);
+      border-radius:10px; padding:8px 10px; min-height:36px; font-size:14px;
+    }
+    .controls button{ cursor:pointer }
+    .controls button:hover{ background:#1a2033 }
 
-    /* === Tableau === */
-    table { width: 100%; border-collapse: collapse; }
-    th, td { border: 1px solid #ddd; padding: 8px 10px; text-align: left; }
-    th { background: #f6f6f6; }
+    /* ===== Multi-select compact ===== */
+    .ms{ position:relative; }
+    .ms .ms-control{
+      display:flex; align-items:center; justify-content:space-between;
+      background:#0d0f18; border:1px solid var(--border); border-radius:10px;
+      min-height:36px; padding:6px 10px; cursor:pointer; user-select:none;
+    }
+    .ms .ms-summary{ display:flex; gap:6px; align-items:center;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .ms .ms-caret{ margin-left:8px; opacity:.7 }
+    .ms .ms-badge{ background:#0f1220; border:1px solid var(--border);
+      border-radius:999px; padding:2px 8px; font-size:.82rem }
+    .ms .ms-panel{
+      display:none; position:absolute; z-index:1000; top:calc(100% + 6px); left:0;
+      min-width:100%; max-height:240px; overflow:auto; background:var(--panel);
+      border:1px solid var(--border); border-radius:10px; padding:8px;
+      box-shadow:0 12px 28px var(--shadow);
+    }
+    .ms.open .ms-panel{ display:block }
+    .ms .ms-option{ display:flex; align-items:center; gap:8px; padding:4px 6px; }
+    .ms .ms-option input{ width:16px; height:16px }
 
-    /* === Formulaires === */
-    input[type="text"], select { padding: 6px 8px; width: 100%; box-sizing: border-box; }
+    /* ===== GRILLE max 6 colonnes ===== */
+    .card-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fill, minmax(var(--col-min), 1fr));
+      gap: var(--gap);
+      margin-top:16px;
+      max-width: calc(6 * var(--col-min) + 5 * var(--gap));
+      margin-left:auto; margin-right:auto;
+    }
+    .poke-card{ position:relative; background:var(--card); border:1px solid var(--border);
+      border-radius:16px; box-shadow:0 8px 20px var(--shadow); padding:12px;
+      transition:transform .18s ease, box-shadow .18s ease; }
+    .poke-card:hover{ transform:translateY(-2px); box-shadow:0 12px 28px var(--shadow) }
+    .img-wrap{ position:relative; border-radius:12px; overflow:hidden; background:#1a1b27;
+      aspect-ratio:63/88; display:flex; align-items:center; justify-content:center; }
+    .img-wrap img{ width:100%; height:100%; object-fit:cover; display:block }
+    .img-wrap .ph{ width:40%; height:40%; opacity:.25; background:#ccc; border-radius:8px }
+    .card-actions{ display:flex; gap:10px; justify-content:center; margin-top:10px }
+    .card-actions button{ font-size:.9rem; padding:6px 10px; background:#0f1220; color:var(--text);
+      border:1px solid var(--border); border-radius:10px; cursor:pointer }
+    .card-actions button:hover{ background:#151a29 }
+    .card-actions button.active{ background:var(--accent); color:#fff; border-color:var(--accent) }
 
-    /* === Boutons === */
-    button { padding: 6px 10px; cursor: pointer; }
-    button.active { background: #4caf50; color: #fff; font-weight: 600; }
+    .hover-info{
+      position:absolute; inset:12px; border-radius:12px; background:rgba(0,0,0,.78); color:#fff;
+      padding:12px; display:flex; flex-direction:column; gap:8px; justify-content:center;
+      opacity:0; visibility:hidden; transition:opacity .15s ease; font-size:.92rem; line-height:1.25rem;
+    }
+    .poke-card:hover .hover-info{ opacity:1; visibility:visible }
+    .badges{ display:flex; flex-wrap:wrap; gap:6px }
+    .badge{ background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2);
+      border-radius:999px; padding:2px 8px; font-size:.78rem }
 
-    /* === Responsive : sur petit écran, 2 colonnes au lieu de 6 === */
-    @media (max-width: 900px) { #controls { grid-template-columns: repeat(2, 1fr); } }
+    #loader{display:none; margin-top:10px; color:var(--muted)}
+    @media (max-width:1100px){ .controls{ grid-template-columns: 1fr 220px 220px 260px 170px 210px auto; } }
+    @media (max-width:860px){ .controls{ grid-template-columns: 1fr 220px 220px 1fr; } .pill{display:none} }
+    @media (max-width:540px){ .card-grid{ grid-template-columns:repeat(2,1fr); gap:14px; max-width:none; } }
   </style>
 </head>
 <body>
-  <!-- === Titre principal === -->
-  <h1>Woenw Trade — Liste de cartes (version test)</h1>
-
-  <!-- === Bandeau indiquant la source des données (local | tcgdex) === -->
-  <div id="data-source-banner">
-    Mode données : <strong>local</strong>
+  <h1>Woenw Trade — V0.7.15</h1>
+  <div class="sub">
+    <span id="data-source-banner"></span>
+    — Pocket uniquement, tous les sets chargés, tri & filtres avancés (multi-sélection compacte).
   </div>
 
-  <!-- === Zone de contrôles (profil, recherche, filtres) === -->
-  <div id="controls">
+  <div class="controls">
+    <input id="search" type="text" placeholder="Recherche (nom, type, set…)" />
 
-    <!-- Sélecteur de profil -->
-    <div>
-      <label for="profile">Profil</label>
-      <select id="profile">
-        <option value="Pocho">Pocho</option>
-        <option value="Julien">Julien</option>
-        <option value="Yaël">Yaël</option>
-        <option value="David">David</option>
-      </select>
-    </div>
+    <!-- Multi-select compact : Type -->
+    <div class="ms" id="ms-type"></div>
+    <!-- Multi-select compact : Rareté -->
+    <div class="ms" id="ms-rarity"></div>
 
-    <!-- Recherche par nom -->
-    <div>
-      <label for="search">Recherche</label>
-      <input id="search" type="text" placeholder="Rechercher une carte…" autocomplete="off" />
-    </div>
+    <!-- Set (mono), Collection (état), Tri -->
+    <select id="filter-set" title="Set"><option value="">-- Tous les sets --</option></select>
+    <select id="filter-collection" title="Collection">
+      <option value="">Toutes les cartes</option>
+      <option value="wishlist">Wishlist seulement</option>
+      <option value="doublons">Doublons seulement</option>
+      <option value="either">Wishlist ou Doublons</option>
+    </select>
+    <select id="sort-by" title="Tri">
+      <option value="setnum-desc">Tri: Set récent → ancien, puis #</option>
+      <option value="setnum-asc">Tri: Set ancien → récent, puis #</option>
+      <option value="num-asc">Numéro ↑</option>
+      <option value="num-desc">Numéro ↓</option>
+      <option value="rarity-desc">Rareté forte → faible</option>
+      <option value="rarity-asc">Rareté faible → forte</option>
+      <option value="type-az">Type A→Z</option>
+      <option value="type-za">Type Z→A</option>
+      <option value="wish-first">Wishlist d’abord</option>
+      <option value="dup-first">Doublons d’abord</option>
+    </select>
 
-    <!-- Filtre par type -->
-    <div>
-      <label for="filter-type">Type</label>
-      <select id="filter-type">
-        <option value="">-- Tous --</option>
-      </select>
-    </div>
+    <span class="pill" id="count-pill">0 carte</span>
+    <span class="pill" id="sets-pill">0/0 sets chargés</span>
 
-    <!-- Filtre par rareté -->
-    <div>
-      <label for="filter-rarity">Rareté</label>
-      <select id="filter-rarity">
-        <option value="">-- Toutes --</option>
-      </select>
-    </div>
-
-    <!-- Filtre par extension -->
-    <div>
-      <label for="filter-set">Extension</label>
-      <select id="filter-set">
-        <option value="">-- Toutes --</option>
-      </select>
-    </div>
-
-    <!-- Case vide pour équilibrer la grille -->
-    <div></div>
+    <select id="profile" title="Profil">
+      <option>Pocho</option><option>Julien</option><option>Yaël</option><option>David</option>
+    </select>
+    <button id="btn-reset">Reset filtres</button>
   </div>
 
-  <!-- === Tableau principal === -->
-  <table>
-    <thead>
-      <tr>
-        <th>Visuel</th>
-        <th>Nom</th>
-        <th>Type</th>
-        <th>Rareté</th>
-        <th>Extension</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody id="cards-body">
-      <!-- Les lignes seront générées en JavaScript -->
-    </tbody>
-  </table>
+  <div id="loader">Chargement…</div>
+  <div id="card-grid" class="card-grid" aria-live="polite"></div>
 
-  <!-- === Script de mise à jour du bandeau (affiche la source actuelle) === -->
-  <script>
-    window.addEventListener('DOMContentLoaded', () => {
-      const banner = document.getElementById('data-source-banner');
-      if (banner && window.DATA_SOURCE) {
-        banner.innerHTML = `Mode données : <strong>${window.DATA_SOURCE}</strong>`;
-      }
-    });
-  </script>
+  <!-- Selects natifs (cachés) utilisés comme "source de vérité" pour la logique -->
+  <select id="filter-type" multiple hidden></select>
+  <select id="filter-rarity" multiple hidden></select>
 
-  <!-- === Script principal (logique JS) === -->
-  <script src="script.js"></script>
+  <script src="script.js" defer></script>
 </body>
 </html>

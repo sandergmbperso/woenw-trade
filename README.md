@@ -16,20 +16,21 @@ Objectif : afficher les cartes depuis un fichier JSON, puis ajouter recherche, f
 
 ---
 
-## Historique des versions
+## Historique
 
-| Étape / Version | Ajout principal      | Description                                     |
-|-----------------|----------------------|-------------------------------------------------|
-| V0.1            | Tableau statique     | HTML seul avec 10 cartes codées en dur.         |
-| V0.2            | Génération JS        | Lignes `<tr>` créées côté client (JavaScript).  |
-| V0.2.1          | Fichier cards.json   | Données séparées dans un fichier JSON + fetch.  |
-| V0.2.2          | Gestion erreurs      | Message si le JSON est introuvable / mal chargé.|
-| V0.3            | Recherche par nom    | Filtrage client insensible à la casse/accents.  |
-| V0.4            | Filtres avancés      | Type / Rareté / Extension combinés avec recherche. |
-| V0.5            | Wishlist / Doublons | Boutons par carte, sauvegarde locale persistante. |
-| V0.6            | Multi-profils       | Listes séparées (Pocho, Julien, Yaël, David).   |
-| V0.7            | Intégration API    | Feature flag pour basculer API TCGdex / `cards.json` (fallback). |
-| V0.7.1          | Colonne images + emojis | Affichage des visuels de cartes, raretés transformées en emojis (💎⭐👑), fallback robuste vers `assets.tcgdex.net`. |
+| Étape / Version | Ajout principal      | Description                                                                                     |
+|-----------------|----------------------|-------------------------------------------------------------------------------------------------|
+| V0.1            | Tableau statique     | HTML seul avec 10 cartes codées en dur.                                                         |
+| V0.2            | Génération JS        | Lignes `<tr>` créées côté client (JavaScript).                                                  |
+| V0.2.1          | Fichier `cards.json` | Données séparées dans un fichier JSON + `fetch`.                                                |
+| V0.2.2          | Gestion erreurs      | Message si le JSON est introuvable / mal chargé.                                                |
+| V0.3            | Recherche par nom    | Filtrage client insensible à la casse/accents.                                                  |
+| V0.4            | Filtres avancés      | Type / Rareté / Extension combinés avec la recherche.                                           |
+| V0.5            | Wishlist / Doublons  | Boutons par carte, sauvegarde locale persistante.                                               |
+| V0.6            | Multi-profils        | Listes séparées (Pocho, Julien, Yaël, David).                                                   |
+| V0.7            | Intégration API      | Basculer entre API TCGdex et `cards.json` (fallback).                                           |
+| V0.7.1          | Images + emojis      | Visuels de cartes + raretés → emojis (💎⭐👑), fallback vers `assets.tcgdex.net`.               |
+| V0.8            | Design & ergo        | Vue Grille (+ infobulles, max 6/ligne); sets Pocket FR+EN; filtres compacts; tris avancés; fallbacks + patch rareté. |
 
 ---
 
@@ -39,14 +40,19 @@ Objectif : afficher les cartes depuis un fichier JSON, puis ajouter recherche, f
 - ~~V0.4 : Filtres Type / Rareté / Extension (menus déroulants).~~ ✔️  
 - ~~V0.5 : Boutons “Wishlist” et “Doublon” (stockage localStorage).~~ ✔️  
 - ~~V0.6 : Multi-profils (amis : Pocho, Julien, Yaël, David) avec listes séparées.~~ ✔️  
-- ~~V0.7 : Intégration API (TCGdex) avec fallback `cards.json`.~~ ✔️
-- ~~V0.7.1 : Colonne images + raretés → emojis (💎⭐👑), fallback vers `assets.tcgdex.net`.~~ ✔️
-- **V0.8 : Perfs & UX** → pagination/virtualisation, recherche avancée, placeholders images robustes, export/import JSON des listes.  
-- **V0.9 : Pipeline & cache** → proxy backend, cache (Redis/Firestore), mise à jour programmée via Kestra, QA data (Soda), observabilité (métriques/logs).  
-- **V1.0 : Partage & comparaison** → partage de liste, comparaison multi-profils, détection d’échanges possibles.  
-- **V1.1 : Collection & stats** → progression par set, totaux par rareté/type, badges.  
-- **V1.2 : Auth & sync (optionnel)** → authentification légère et synchronisation cloud.
+- ~~V0.7 : Intégration API (TCGdex) avec fallback `cards.json`.~~ ✔️  
+- ~~V0.7.1 : Colonne images + raretés → emojis (💎⭐👑), fallback vers `assets.tcgdex.net`.~~ ✔️  
+- ~~V0.8 : Design & ergonomie (vue Grille, filtres compacts, tri avancé, fusion FR+EN des sets, patch rareté, fallbacks images).~~ ✔️
 
+---
+
+## À venir
+- **V0.9 — Perf & fiabilité**  
+  Virtualisation / lazy-grid, cache **IndexedDB** (sets & cartes), retry/backoff + `AbortController`, barre de progression & toasts.
+- **V0.10 — Détail & collection**  
+  Panneau détail carte (HD, stats, attaques…), compteur de doublons (0/1/2/…), notes perso, export/import JSON/CSV, stats (par set/type/rareté, % complétion).
+- **V0.11 — UX & partage**  
+  Synchronisation filtres ↔ URL (liens partageables), presets de filtres, raccourcis clavier, thème clair/sombre, accessibilité ARIA/Tab.
 ---
 
 ## Installation & exécution
