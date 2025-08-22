@@ -3,17 +3,6 @@
 Projet web expérimental pour lister et gérer des cartes (version test).  
 Objectif : afficher les cartes depuis un fichier JSON, puis ajouter recherche, filtres, wishlist/doublons et comparaison entre amis.  
 
-## Fonctionnalités actuelles (V0.6)
-
-- Tableau HTML lisible (CSS minimal).  
-- Données externalisées dans `cards.json` (chargées via `fetch`).  
-- Génération dynamique des lignes par JavaScript.  
-- Gestion d’erreur si `cards.json` est introuvable ou invalide.  
-- Recherche par nom en temps réel (insensible à la casse/accents).  
-- Filtres par Type, Rareté et Extension (combinables avec la recherche).  
-- Boutons **Wishlist** et **Doublon** avec persistance via `localStorage`.  
-- Multi-profils (Pocho, Julien, Yaël, David) avec listes séparées pour wishlist/doublons. ✅ NEW
-
 ---
 
 ## Historique
@@ -31,6 +20,7 @@ Objectif : afficher les cartes depuis un fichier JSON, puis ajouter recherche, f
 | V0.7            | Intégration API      | Basculer entre API TCGdex et `cards.json` (fallback).                                           |
 | V0.7.1          | Images + emojis      | Visuels de cartes + raretés → emojis (💎⭐👑), fallback vers `assets.tcgdex.net`.               |
 | V0.8            | Design & ergo        | Vue Grille (+ infobulles, max 6/ligne); sets Pocket FR+EN; filtres compacts; tris avancés; fallbacks + patch rareté. |
+| V0.9            | Perf & progressif    | Rendu progressif des sets, scroll infini fenêtré, lazy images, perfs réseau optimisées. |
 
 ---
 
@@ -43,6 +33,7 @@ Objectif : afficher les cartes depuis un fichier JSON, puis ajouter recherche, f
 - ~~V0.7 : Intégration API (TCGdex) avec fallback `cards.json`.~~ ✔️  
 - ~~V0.7.1 : Colonne images + raretés → emojis (💎⭐👑), fallback vers `assets.tcgdex.net`.~~ ✔️  
 - ~~V0.8 : Design & ergonomie (vue Grille, filtres compacts, tri avancé, fusion FR+EN des sets, patch rareté, fallbacks images).~~ ✔️
+- ~~V0.9 : Performance & rendu progressif (sets affichés dès dispo, scroll infini fenêtré, lazy images, perfs réseau).~~ ✔️  
 
 ---
 
